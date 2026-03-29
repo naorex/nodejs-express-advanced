@@ -1,0 +1,29 @@
+<!doctype html>
+<html lan="jp">
+  <head>
+    <meta charset="UTF-8" />
+    <title>ブログ投稿ページ</title>
+    <%- include("./head"); %>
+  </head>
+  <body>
+    <%- include("./header"); %>
+    <main>
+      <div>
+        <h1>記事を書く</h1>
+        <div>
+          <form action="/blog/create" method="POST">
+            <label for="title">タイトル</label>
+            <input type="text" name="title" required />
+            <label for="summary">要約</label>
+            <input type="text" name="summary" required />
+            <label for="image">イメージ</label>
+            <input type="text" name="image" placeholder="/img1.jpg" required />
+            <textarea name="textBody" rows="15" required></textarea>
+            <button type="submit">投稿</button>
+          </form>
+        </div>
+      </div>
+    </main>
+    <%- include("./footer"); %>
+  </body>
+</html>

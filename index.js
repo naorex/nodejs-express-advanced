@@ -1,11 +1,12 @@
 import dotenv from 'dotenv';
 import express from 'express';
 import mongoose from 'mongoose';
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+// 以下はblogCreate.html の場合に使用
+// import { fileURLToPath } from 'url';
+// import { dirname } from 'path';
+// const __filename = fileURLToPath(import.meta.url);
+// const __dirname = dirname(__filename);
 
 // 設定読み込み
 dotenv.config();
@@ -13,6 +14,7 @@ const { MONGODB_INSTANCE_URL } = process.env;
 
 const app = express();
 app.use(express.urlencoded({ extended: true }));
+app.set('view engine', 'ejs');
 
 // MongoDB へ接続
 mongoose
@@ -38,7 +40,8 @@ const BlogModel = mongoose.model('Blog', BlogSchema);
 
 // Create an article
 app.get('/blog/create', (req, res) => {
-  res.sendFile(__dirname + '/views/blogCreate.html');
+  // res.sendFile(__dirname + '/views/blogCreate.html');
+  res.render('blogCreate');
 });
 
 app.post('/blog/create', (req, res) => {
@@ -59,14 +62,16 @@ app.post('/blog/create', (req, res) => {
 app.get('/', async (req, res) => {
   const allBlogs = await BlogModel.find(); // 取得完了まで待つ
   console.log('allBlogsの中身', allBlogs);
-  res.send('全ブログデータを読み取りました');
+  // res.send('全ブログデータを読み取りました');
+  res.render('index', { allBlogs }); // ejs用は .render()
 });
 
 // Read Single article
 app.get('/blog/:id', async (req, res) => {
   const singleBlog = await BlogModel.findById(req.params.id);
   console.log('singleBlogの中身:', singleBlog);
-  res.send('個別の記事ページ');
+  // res.send('個別の記事ページ');
+  res.render('blogRead', { singleBlog });
 });
 
 // Update article

@@ -11,6 +11,7 @@
         <% allBlogs.forEach((blog)=>{ %>
           <div>
             <a href="blog/<%= blog._id %>">
+              <img src="/public/images<%= blog.image %>" alt="blog-image">
               <div>
                 <h2><%= blog.title %></h2>
                 <p><%= blog.summary %></p>

@@ -15,6 +15,7 @@ const { MONGODB_INSTANCE_URL } = process.env;
 const app = express();
 app.use(express.urlencoded({ extended: true }));
 app.set('view engine', 'ejs');
+app.use('/public', express.static('public'));
 
 // MongoDB へ接続
 mongoose
@@ -78,7 +79,8 @@ app.get('/blog/:id', async (req, res) => {
 app.get('/blog/update/:id', async (req, res) => {
   const singleBlog = await BlogModel.findById(req.params.id);
   console.log('singleBlogの中身:', singleBlog);
-  res.send('個別の記事編集ページ');
+  // res.send('個別の記事編集ページ');
+  res.render('blogUpdate', { singleBlog });
 });
 
 app.post('/blog/update/:id', (req, res) => {
@@ -98,7 +100,8 @@ app.post('/blog/update/:id', (req, res) => {
 app.get('/blog/delete/:id', async (req, res) => {
   const singleBlog = await BlogModel.findById(req.params.id);
   console.log('singleBlogの中身:', singleBlog);
-  res.send('個別の記事削除ページ');
+  // res.send('個別の記事削除ページ');
+  res.render('blogDelete', { singleBlog });
 });
 
 app.post('/blog/delete/:id', (req, res) => {

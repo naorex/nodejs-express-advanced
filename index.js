@@ -36,11 +36,6 @@ const BlogSchema = new Schema({
 
 const BlogModel = mongoose.model('Blog', BlogSchema);
 
-// ブログ関係の機能
-app.get('/', (req, res) => {
-  res.send('Hello');
-});
-
 // Create an article
 app.get('/blog/create', (req, res) => {
   res.sendFile(__dirname + '/views/blogCreate.html');
@@ -61,13 +56,60 @@ app.post('/blog/create', (req, res) => {
 });
 
 // Read All articles
+app.get('/', async (req, res) => {
+  const allBlogs = await BlogModel.find(); // 取得完了まで待つ
+  console.log('allBlogsの中身', allBlogs);
+  res.send('全ブログデータを読み取りました');
+});
 
 // Read Single article
+app.get('/blog/:id', async (req, res) => {
+  const singleBlog = await BlogModel.findById(req.params.id);
+  console.log('singleBlogの中身:', singleBlog);
+  res.send('個別の記事ページ');
+});
 
 // Update article
+app.get('/blog/update/:id', async (req, res) => {
+  const singleBlog = await BlogModel.findById(req.params.id);
+  console.log('singleBlogの中身:', singleBlog);
+  res.send('個別の記事編集ページ');
+});
+
+app.post('/blog/update/:id', (req, res) => {
+  BlogModel.updateOne({ _id: req.params.id }, req.body)
+    .then(() => {
+      console.log('データの編集が成功');
+      res.send('ブログデータの編集が成功');
+    })
+    .catch((error) => {
+      console.log(error);
+      console.log('データの編集が失敗');
+      res.send('ブログデータの編集が失敗');
+    });
+});
 
 // Delete article
+app.get('/blog/delete/:id', async (req, res) => {
+  const singleBlog = await BlogModel.findById(req.params.id);
+  console.log('singleBlogの中身:', singleBlog);
+  res.send('個別の記事削除ページ');
+});
 
+app.post('/blog/delete/:id', (req, res) => {
+  BlogModel.deleteOne({ _id: req.params.id })
+    .then(() => {
+      console.log('データの削除が成功');
+      res.send('ブログデータの削除が成功');
+    })
+    .catch((error) => {
+      console.log(error);
+      console.log('データの削除が失敗');
+      res.send('ブログデータの削除が失敗');
+    });
+});
+
+// app
 app.listen(3000, () => {
   console.log('Listening on localhost port 3000');
 });

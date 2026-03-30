@@ -37,7 +37,14 @@ const BlogSchema = new Schema({
   textBody: String,
 });
 
+const UserSchema = new Schema({
+  name: { type: String, required: true },
+  email: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
+});
+
 const BlogModel = mongoose.model('Blog', BlogSchema);
+const UserModel = mongoose.model('User', UserSchema);
 
 // Create an article
 app.get('/blog/create', (req, res) => {
@@ -114,6 +121,24 @@ app.post('/blog/delete/:id', (req, res) => {
       console.log(error);
       console.log('データの削除が失敗');
       res.send('ブログデータの削除が失敗');
+    });
+});
+
+// Create user
+app.get('/user/create', (req, res) => {
+  res.render('userCreate');
+});
+
+app.post('/user/create', (req, res) => {
+  UserModel.create(req.body)
+    .then(() => {
+      console.log('ユーザーデータの書き込みが成功');
+      res.send('ユーザーデータの登録が成功');
+    })
+    .catch((error) => {
+      console.log(error);
+      console.log('ユーザーデータの書き込みが失敗');
+      res.send('ユーザーデータの登録が失敗');
     });
 });
 

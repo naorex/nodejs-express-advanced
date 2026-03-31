@@ -142,6 +142,29 @@ app.post('/user/create', (req, res) => {
     });
 });
 
+// Login
+app.get('/user/login', (req, res) => {
+  res.render('login');
+});
+
+app.post('/user/login', (req, res) => {
+  UserModel.findOne({ email: req.body.email })
+    .then((savedData) => {
+      if (savedData) {
+        if (req.body.password === savedData.password) {
+          res.send('ログイン成功');
+        } else {
+          res.send('パスワードが間違っている');
+        }
+      } else {
+        res.send('ユーザーが存在しません');
+      }
+    })
+    .catch(() => {
+      res.send('エラー発生');
+    });
+});
+
 // app
 app.listen(3000, () => {
   console.log('Listening on localhost port 3000');

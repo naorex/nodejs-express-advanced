@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>ログインページ</title>
+    <%- include("./head"); %>
+  </head>
+  <body>
+    <%- include("./header"); %>
+    <main>
+      <div>
+        <h1>ログイン</h1>
+        <div>
+          <form action="/user/login" method="POST">
+            <label for="email">Email</label>
+            <input type="text" name="email" required />
+            <label for="password">パスワード</label>
+            <br />
+            <input type="text" name="password" required />
+            <button type="submit">ログイン</button>
+          </form>
+        </div>
+      </div>
+    </main>
+    <%- include("./footer"); %>
+  </body>
+</html>

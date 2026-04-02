@@ -1,6 +1,7 @@
 import dotenv from 'dotenv';
 import express from 'express';
 import mongoose from 'mongoose';
+import session from 'express-session';
 
 // 以下はblogCreate.html の場合に使用
 // import { fileURLToPath } from 'url';
@@ -16,6 +17,16 @@ const app = express();
 app.use(express.urlencoded({ extended: true }));
 app.set('view engine', 'ejs');
 app.use('/public', express.static('public'));
+
+// Session
+app.use(
+  session({
+    secret: 'secretKey',
+    resave: false,
+    saveUninitialized: false,
+    cookie: { maxAge: 3600000 },
+  })
+);
 
 // MongoDB へ接続
 mongoose
@@ -69,7 +80,8 @@ app.post('/blog/create', (req, res) => {
 // Read All articles
 app.get('/', async (req, res) => {
   const allBlogs = await BlogModel.find(); // 取得完了まで待つ
-  console.log('allBlogsの中身', allBlogs);
+  // console.log('allBlogsの中身', allBlogs);
+  console.log('reqの中身', req);
   // res.send('全ブログデータを読み取りました');
   res.render('index', { allBlogs }); // ejs用は .render()
 });
@@ -152,6 +164,7 @@ app.post('/user/login', (req, res) => {
     .then((savedData) => {
       if (savedData) {
         if (req.body.password === savedData.password) {
+          req.session.userId = savedData._id.toString(); // sessionID 確認用
           res.send('ログイン成功');
         } else {
           res.send('パスワードが間違っている');

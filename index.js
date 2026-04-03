@@ -60,20 +60,25 @@ const UserModel = mongoose.model('User', UserSchema);
 // Create an article
 app.get('/blog/create', (req, res) => {
   // res.sendFile(__dirname + '/views/blogCreate.html');
-  res.render('blogCreate');
+  if (req.session.userId) {
+    res.render('blogCreate');
+  } else {
+    res.redirect('/user/login');
+  }
 });
 
 app.post('/blog/create', (req, res) => {
-  console.log('req の中身', req.body);
+  // console.log('req の中身', req.body);
   BlogModel.create(req.body)
     .then(() => {
-      console.log('データの書き込みが成功');
-      res.send('ブログデータの投稿が成功');
+      res.redirect('/');
+      // console.log('データの書き込みが成功');
+      // res.send('ブログデータの投稿が成功');
     })
     .catch((error) => {
-      console.log(error);
-      console.log('データの書き込みが失敗');
-      res.send('ブログデータの投稿が失敗');
+      res.render('error', { message: '/blog/create のエラー' });
+      // console.log('データの書き込みが失敗');
+      // res.send('ブログデータの投稿が失敗');
     });
 });
 
@@ -81,23 +86,31 @@ app.post('/blog/create', (req, res) => {
 app.get('/', async (req, res) => {
   const allBlogs = await BlogModel.find(); // 取得完了まで待つ
   // console.log('allBlogsの中身', allBlogs);
-  console.log('reqの中身', req);
+  // console.log('reqの中身', req);
   // res.send('全ブログデータを読み取りました');
-  res.render('index', { allBlogs }); // ejs用は .render()
+  // res.render('index', { allBlogs }); // ejs用は .render()
+  res.render('index', {
+    allBlogs: allBlogs,
+    session: req.session.userId, // ログインしているユーザーにのみ /blog/create を表示させたいため、userId を session に渡す
+  });
 });
 
 // Read Single article
 app.get('/blog/:id', async (req, res) => {
   const singleBlog = await BlogModel.findById(req.params.id);
-  console.log('singleBlogの中身:', singleBlog);
+  // console.log('singleBlogの中身:', singleBlog);
   // res.send('個別の記事ページ');
-  res.render('blogRead', { singleBlog });
+  // res.render('blogRead', { singleBlog });
+  res.render('blogRead', {
+    singleBlog: singleBlog,
+    session: req.session.userId,
+  });
 });
 
 // Update article
 app.get('/blog/update/:id', async (req, res) => {
   const singleBlog = await BlogModel.findById(req.params.id);
-  console.log('singleBlogの中身:', singleBlog);
+  // console.log('singleBlogの中身:', singleBlog);
   // res.send('個別の記事編集ページ');
   res.render('blogUpdate', { singleBlog });
 });
@@ -105,20 +118,22 @@ app.get('/blog/update/:id', async (req, res) => {
 app.post('/blog/update/:id', (req, res) => {
   BlogModel.updateOne({ _id: req.params.id }, req.body)
     .then(() => {
-      console.log('データの編集が成功');
-      res.send('ブログデータの編集が成功');
+      res.redirect('/');
+      // console.log('データの編集が成功');
+      // res.send('ブログデータの編集が成功');
     })
     .catch((error) => {
-      console.log(error);
-      console.log('データの編集が失敗');
-      res.send('ブログデータの編集が失敗');
+      // console.log(error);
+      res.render('error', { message: '/blog/update のエラー' });
+      // console.log('データの編集が失敗');
+      // res.send('ブログデータの編集が失敗');
     });
 });
 
 // Delete article
 app.get('/blog/delete/:id', async (req, res) => {
   const singleBlog = await BlogModel.findById(req.params.id);
-  console.log('singleBlogの中身:', singleBlog);
+  // console.log('singleBlogの中身:', singleBlog);
   // res.send('個別の記事削除ページ');
   res.render('blogDelete', { singleBlog });
 });
@@ -126,13 +141,15 @@ app.get('/blog/delete/:id', async (req, res) => {
 app.post('/blog/delete/:id', (req, res) => {
   BlogModel.deleteOne({ _id: req.params.id })
     .then(() => {
-      console.log('データの削除が成功');
-      res.send('ブログデータの削除が成功');
+      res.redirect('/');
+      // console.log('データの削除が成功');
+      // res.send('ブログデータの削除が成功');
     })
     .catch((error) => {
-      console.log(error);
-      console.log('データの削除が失敗');
-      res.send('ブログデータの削除が失敗');
+      // console.log(error);
+      res.render('error', { message: '/blog/delete のエラー' });
+      // console.log('データの削除が失敗');
+      // res.send('ブログデータの削除が失敗');
     });
 });
 
@@ -144,13 +161,15 @@ app.get('/user/create', (req, res) => {
 app.post('/user/create', (req, res) => {
   UserModel.create(req.body)
     .then(() => {
-      console.log('ユーザーデータの書き込みが成功');
-      res.send('ユーザーデータの登録が成功');
+      res.redirect('/');
+      // console.log('ユーザーデータの書き込みが成功');
+      // res.send('ユーザーデータの登録が成功');
     })
     .catch((error) => {
-      console.log(error);
-      console.log('ユーザーデータの書き込みが失敗');
-      res.send('ユーザーデータの登録が失敗');
+      // console.log(error);
+      res.render('error', { message: 'user/create のエラー' });
+      // console.log('ユーザーデータの書き込みが失敗');
+      // res.send('ユーザーデータの登録が失敗');
     });
 });
 
@@ -164,17 +183,21 @@ app.post('/user/login', (req, res) => {
     .then((savedData) => {
       if (savedData) {
         if (req.body.password === savedData.password) {
-          req.session.userId = savedData._id.toString(); // sessionID 確認用
-          res.send('ログイン成功');
+          req.session.userId = savedData._id.toString();
+          // res.send('ログイン成功');
+          res.redirect('/');
         } else {
-          res.send('パスワードが間違っている');
+          // res.send('パスワードが間違っている');
+          res.render('error', { message: '/user/login のエラー' });
         }
       } else {
-        res.send('ユーザーが存在しません');
+        // res.send('ユーザーが存在しません');
+        res.render('error', { message: '/user/login のエラー' });
       }
     })
     .catch(() => {
-      res.send('エラー発生');
+      // res.send('エラー発生');
+      res.render('error', { message: '/user/login のエラー' });
     });
 });
 

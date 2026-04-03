@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ja">
   <head>
-    <title>Indexページ</title>
+    <title>Node Advanced Blog</title>
     <%- include("./head"); %>
   </head>
   <body>
@@ -9,16 +9,27 @@
     <main>
       <div>
         <% allBlogs.forEach((blog)=>{ %>
-          <div>
+          <div class="grid-container">
             <a href="blog/<%= blog._id %>">
               <img src="/public/images<%= blog.image %>" alt="blog-image">
-              <div>
+              <div class="texts-area">
                 <h2><%= blog.title %></h2>
                 <p><%= blog.summary %></p>
               </div>
             </a>
           </div>
         <% }) %>
+      </div>
+      <div class="buttom">
+        <% if(session !== undefined){ %>
+          <a href="/blog/create" class="create-button">記事を書く</a>
+        <% } %>
+        <% if(session === undefined){ %>
+          <a href="/user/login" class="login-button">ログイン</a>
+        <% } %>
+        <% if(session === undefined){ %>
+          <a href="/user/create" class="user-create-button">登録する</a>
+        <% } %>
       </div>
     </main>
     <%- include("./footer"); %>
